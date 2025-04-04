@@ -2,17 +2,25 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY requirements.txt /app
+# Copiar e instalar requirements
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiamos todos los .proto compilados (generados) si fuera necesario,
-# pero aquí asumimos que los microservicios ya los exponen. 
-# Para este Gateway, con las definiciones de proto basta con compilar localmente 
-# o bien se pueden copiar. Dependiendo de cómo prefieras.
+# Copiar todos los archivos .proto antes de compilarlos
+COPY sum.proto .
+COPY sub.proto .
+COPY mul.proto .
+COPY div.proto .
 
+# Compilar los .proto a archivos .py (pb2 y pb2_grpc)
+RUN python -m grpc_tools.protoc \
+    --proto_path=. \
+    --python_out=. \
+    --grpc_python_out=. \
+    sum.proto sub.proto mul.proto div.proto
 
-
-COPY gateway.py /app
+# Copiar el código del gateway (después de compilar los .proto)
+COPY gateway.py .
 
 EXPOSE 8000
 
