@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package div;
+
+service DivService {
+  rpc DoDiv (DivRequest) returns (DivReply);
+}
+
+message DivRequest {
+  float a = 1;
+  float b = 2;
+}
+
+message DivReply {
+  float result = 1;
+}
