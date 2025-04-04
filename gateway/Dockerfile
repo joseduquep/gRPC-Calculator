@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Para este Gateway, con las definiciones de proto basta con compilar localmente 
 # o bien se pueden copiar. Dependiendo de cómo prefieras.
 
+
+
 COPY gateway.py /app
 
 EXPOSE 8000
