@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package mul;
+
+service MulService {
+  rpc DoMul (MulRequest) returns (MulReply);
+}
+
+message MulRequest {
+  float a = 1;
+  float b = 2;
+}
+
+message MulReply {
+  float result = 1;
+}

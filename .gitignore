@@ -1,0 +1,10 @@
+# .gitignore
+
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+env/
+.idea/
+.protobuf_generated/

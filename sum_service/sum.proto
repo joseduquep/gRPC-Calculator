@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sum;
+
+service SumService {
+  // Define el RPC de suma
+  rpc DoSum (SumRequest) returns (SumReply);
+}
+
+message SumRequest {
+  float a = 1;
+  float b = 2;
+}
+
+message SumReply {
+  float result = 1;
+}

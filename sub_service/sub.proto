@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package sub;
+
+service SubService {
+  rpc DoSub (SubRequest) returns (SubReply);
+}
+
+message SubRequest {
+  float a = 1;
+  float b = 2;
+}
+
+message SubReply {
+  float result = 1;
+}

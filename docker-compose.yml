@@ -1,0 +1,84 @@
+# docker-compose.yml
+
+version: '3.8'
+services:
+  # --- BROKER RABBITMQ OFICIAL ---
+  rabbitmq-broker:
+    image: rabbitmq:3.9-management
+    container_name: rabbitmq-broker
+    ports:
+      - "5672:5672"   # Puerto de comunicación AMQP
+      - "15672:15672" # (Opcional) Interfaz de gestión web de RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+
+  # --- CONSUMIDOR RABBITMQ ---
+  rabbitmq_consumer:
+    build: ./rabbitmq
+    container_name: rabbitmq-consumer
+    depends_on:
+      - rabbitmq-broker
+      - sum_service
+      - sub_service
+      - mul_service
+      - div_service
+    environment:
+      RABBIT_HOST: rabbitmq-broker
+      RABBIT_USER: admin
+      RABBIT_PASS: admin
+
+  # --- MICROSERVICIOS GRPC ---
+  sum_service:
+    build: ./sum_service
+    container_name: sum_service
+    ports:
+      - "50051:50051"
+    depends_on:
+      - rabbitmq-broker
+
+  sub_service:
+    build: ./sub_service
+    container_name: sub_service
+    ports:
+      - "50052:50052"
+    depends_on:
+      - rabbitmq-broker
+
+  mul_service:
+    build: ./mul_service
+    container_name: mul_service
+    ports:
+      - "50053:50053"
+    depends_on:
+      - rabbitmq-broker
+
+  div_service:
+    build: ./div_service
+    container_name: div_service
+    ports:
+      - "50054:50054"
+    depends_on:
+      - rabbitmq-broker
+
+  # --- GATEWAY FastAPI ---
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - sum_service
+      - sub_service
+      - mul_service
+      - div_service
+      - rabbitmq-broker
+
+  # --- CLIENTE REST FastAPI ---
+  client_rest:
+    build: ./client_rest
+    container_name: client_rest
+    ports:
+      - "9000:9000"
+    depends_on:
+      - gateway
