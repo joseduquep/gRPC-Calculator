@@ -21,3 +21,4 @@ RUN python -m grpc_tools.protoc \
 COPY consumer.py /app
 
 CMD ["python", "consumer.py"]
+

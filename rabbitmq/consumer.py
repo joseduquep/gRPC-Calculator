@@ -13,6 +13,7 @@ import mul_pb2_grpc
 import div_pb2
 import div_pb2_grpc
 
+print("🟢 [INICIO] El archivo consumer.py se está ejecutando.")
 RABBIT_HOST = os.getenv("RABBIT_HOST", "rabbitmq-broker")
 RABBIT_USER = os.getenv("RABBIT_USER", "admin")
 RABBIT_PASS = os.getenv("RABBIT_PASS", "admin")
@@ -46,34 +47,32 @@ def call_div_service(a, b):
     print(f"[rabbitmq_consumer] División procesada: {a} / {b} = {response.result}")
 
 def callback(ch, method, properties, body):
-    """
-    body es un string que representa un diccionario con keys: { op, a, b }
-    Ejemplo: "{'op': 'sum', 'a': 3.2, 'b': 4.5}"
-    """
-    message_str = body.decode('utf-8')
-    data = ast.literal_eval(message_str)  # Convertir string -> dict
-    op = data.get("op")
-    a = float(data.get("a", 0))
-    b = float(data.get("b", 0))
+    import json
+    data = eval(body.decode())
+    op = data["op"]
+    a = data["a"]
+    b = data["b"]
 
     print(f"[rabbitmq_consumer] Recibí mensaje en cola {method.routing_key}: {data}")
 
     try:
         if op == "sum":
-            call_sum_service(a, b)
-        elif op == "sub":
-            call_sub_service(a, b)
-        elif op == "mul":
-            call_mul_service(a, b)
-        elif op == "div":
-            call_div_service(a, b)
-    except Exception as e:
-        print(f"[rabbitmq_consumer] Error procesando mensaje {data}: {e}")
+            with grpc.insecure_channel("sum_service:50051") as channel:
+                stub = sum_pb2_grpc.SumServiceStub(channel)
+                request = sum_pb2.SumRequest(a=a, b=b)
+                response = stub.DoSum(request)
+                print(f"[✔] Resultado suma: {a} + {b} = {response.result}")
+        # Resto de operaciones si las tienes...
 
-    # Confirmar (ACK) que hemos procesado el mensaje
-    ch.basic_ack(delivery_tag=method.delivery_tag)
+        # 🔁 Solo aquí hacemos ack si todo fue bien
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    except Exception as e:
+        print(f"[❌] Error procesando mensaje {data}: {e}")
+        # ❌ No hacemos ack: el mensaje queda en la cola (unacked) y se reintentará
 
 def main():
+    print("🔁 [MAIN] Entrando al bucle principal...")
     credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASS)
 
     while True:
@@ -89,19 +88,19 @@ def main():
             channel.queue_declare(queue="mul_queue", durable=True)
             channel.queue_declare(queue="div_queue", durable=True)
 
-            # Consumir de cada cola
-            channel.basic_consume(queue="sum_queue", on_message_callback=callback)
-            channel.basic_consume(queue="sub_queue", on_message_callback=callback)
-            channel.basic_consume(queue="mul_queue", on_message_callback=callback)
-            channel.basic_consume(queue="div_queue", on_message_callback=callback)
+            # Consumir de cada cola con auto_ack activado
+            channel.basic_consume(queue="sum_queue", on_message_callback=callback, auto_ack=False)
+            channel.basic_consume(queue="sub_queue", on_message_callback=callback, auto_ack=False)
+            channel.basic_consume(queue="mul_queue", on_message_callback=callback, auto_ack=False)
+            channel.basic_consume(queue="div_queue", on_message_callback=callback, auto_ack=False)
 
-            print("[rabbitmq_consumer] Esperando mensajes en sum_queue, sub_queue, mul_queue, div_queue")
+            print("[rabbitmq_consumer] ✅ Escuchando sum_queue, sub_queue, mul_queue, div_queue (auto_ack ON)")
             channel.start_consuming()
         except pika.exceptions.AMQPConnectionError as e:
-            print("[rabbitmq_consumer] No se pudo conectar a RabbitMQ, reintentando en 5s...")
+            print("[rabbitmq_consumer] ❌ No se pudo conectar a RabbitMQ, reintentando en 5s...")
             time.sleep(5)
         except KeyboardInterrupt:
-            print("[rabbitmq_consumer] Saliendo...")
+            print("[rabbitmq_consumer] 🛑 Saliendo...")
             break
 
 if __name__ == "__main__":
