@@ -1,45 +1,160 @@
-# gRPC-Calculator
+# Proyecto: Calculadora Distribuida con gRPC, REST y RabbitMQ
 
-**gRPC-Calculator** es una implementacion academica para el entendimiento de la arquitectura basada en microservicios. Es una calculadora distribuida utilizando gRPC y RabbitMQ. Cada operación aritmética básica (suma, resta, multiplicación y división) se maneja mediante un microservicio independiente, lo que permite escalabilidad y mantenimiento modular.
+## Info de la materia
 
-## Tabla de Contenidos
+**Materia:** ST0263: Tópicos Especiales en Telemática  
+**Estudiantes:**
+- Jose Alejandro Duque Piedrahita - jaduquep@eafit.edu.co
+- Pedro Saldarriaga Fontan - psaldarrif@eafit.edu.co
+- Juan Pablo Zuluaga Pelaez - jpzuluagap@eafit.edu.co
 
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Requisitos Previos](#requisitos-previos)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Notas Adicionales](#notas-adicionales)
-- [Licencia](#licencia)
+**Profesor:** Alvaro Enrique Ospina Sanjuan - aeospinas@eafit.edu.co
 
-## Estructura del Proyecto
+---
 
-El proyecto está organizado en los siguientes directorios y archivos principales:
+# 1. Nombre del proyecto
 
-- **client_rest/**: Cliente REST construido con FastAPI que interactúa con el gateway para realizar operaciones aritméticas.
-- **gateway/**: Puerta de enlace que recibe solicitudes del cliente REST y las dirige a los microservicios correspondientes a través de RabbitMQ.
-- **sum_service/**: Microservicio que maneja operaciones de suma.
-- **sub_service/**: Microservicio que maneja operaciones de resta.
-- **mul_service/**: Microservicio que maneja operaciones de multiplicación.
-- **div_service/**: Microservicio que maneja operaciones de división.
-- **rabbitmq/**: Configuración y consumidor de RabbitMQ para manejar la cola de mensajes entre el gateway y los microservicios.
-- **docker-compose.yml**: Archivo de configuración para Docker Compose que orquesta todos los servicios del proyecto.
+**Calculadora Distribuida basada en Microservicios usando gRPC, REST y RabbitMQ**
 
-## Requisitos Previos
+## 1.1 Breve descripción de la actividad
 
-Antes de instalar y ejecutar el proyecto, asegúrate de tener instalados los siguientes componentes:
+Implementación de una aplicación distribuida con:
+- Cliente REST
+- API Gateway
+- Microservicios gRPC
+- Middleware orientado a mensajes (RabbitMQ)
+- Contenerización completa con Docker
 
-- **Docker**: Para crear y gestionar contenedores.
-- **Docker Compose**: Para orquestar múltiples contenedores.
+## 1.2 Aspectos cumplidos (requerimientos funcionales y no funcionales)
 
-Además, si estás utilizando **Windows**, es necesario:
+- Cliente REST funcional con FastAPI
+- API Gateway desarrollado en FastAPI
+- Microservicios independientes para suma, resta, multiplicación y división usando gRPC
+- Integración de RabbitMQ como Message-Oriented Middleware (MOM)
+- Implementación de consumidor RabbitMQ para operaciones fallidas
+- Contenerización de todos los componentes con Docker
+- Documentación automática de APIs con Swagger (FastAPI)
+- Arquitectura desacoplada y escalable
 
-- **WSL2 (Windows Subsystem for Linux 2)**: Para ejecutar entornos Linux en Windows y permitir la integración con Docker.
+## 1.3 Aspectos NO cumplidos
 
-## Instalación
+- El sistema de failover almacena mensajes en RabbitMQ pero **no reenvía automáticamente** tras la recuperación del microservicio.
+- Despliegue en AWS EC2 **pendiente**.
 
-Sigue estos pasos para instalar y ejecutar el proyecto:
+---
 
-1. **Clona el repositorio**:
+# 2. Información general de diseño de alto nivel
 
-   ```bash
-   git clone https://github.com/joseduquep/gRPC-Calculator.git
+- Arquitectura basada en microservicios
+- API Gateway Pattern para centralización de solicitudes
+- Comunicación eficiente entre servicios usando gRPC + Protocol Buffers
+- RabbitMQ como broker de mensajes para tolerancia a fallos (MOM)
+- Docker + Docker Compose para contenerización y orquestación
+- Principios de bajo acoplamiento y alta cohesión
+
+---
+
+# 3. Ambiente de desarrollo y detalles técnicos
+
+## 3.1 Tecnologías utilizadas
+
+- **Lenguaje:** Python 3.11
+- **Frameworks:**
+  - FastAPI (REST y Gateway)
+  - gRPC (microservicios)
+  - RabbitMQ (MOM)
+- **Librerías:**
+  - grpcio, grpcio-tools
+  - pika
+- **Contenerización:** Docker 24.0
+- **Broker:** RabbitMQ 3.9-management
+
+## 3.2 Cómo se compila y ejecuta
+
+```bash
+git clone https://github.com/joseduquep/gRPC-Calculator.git
+cd gRPC-Calculator
+docker-compose up --build
+```
+
+Servicios disponibles:
+- Cliente REST: [http://localhost:8000/docs](http://localhost:8000/docs)
+- RabbitMQ Admin: [http://localhost:15672](http://localhost:15672) (admin/admin)
+
+## 3.3 Configuración de parámetros
+
+Variables de entorno:
+- `RABBIT_HOST=rabbitmq-broker`
+- `RABBIT_USER=admin`
+- `RABBIT_PASS=admin`
+
+Puertos expuestos:
+- Cliente REST: `8000`
+- RabbitMQ AMQP: `5672`, Web: `15672`
+
+## 3.4 Estructura de directorios
+
+```bash
+.
+├── client_rest
+├── gateway
+├── sum_service
+├── sub_service
+├── mul_service
+├── div_service
+├── rabbitmq
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+# 4. Ambiente de ejecución (producción)
+
+## 4.1 Tecnologías utilizadas en producción
+
+- Python 3.11
+- Docker 24.0
+- Docker Compose
+- RabbitMQ 3.9-management
+
+(Despliegue en AWS EC2 pendiente)
+
+## 4.2 Cómo lanzar el servidor
+
+```bash
+git clone https://github.com/joseduquep/gRPC-Calculator.git
+cd gRPC-Calculator
+docker-compose up -d
+```
+
+## 4.3 Mini guía de uso
+
+1. Ingresar a [http://<IP-SERVIDOR>:8000/docs](http://<IP-SERVIDOR>:8000/docs)
+2. Ejecutar operaciones:
+   - `/sum` suma
+   - `/sub` resta
+   - `/mul` multiplicación
+   - `/div` división
+3. Consultar mensajes pendientes en [http://<IP-SERVIDOR>:15672](http://<IP-SERVIDOR>:15672)
+
+---
+
+# 5. Otra información relevante
+
+- Proyecto modular y escalable
+- Implementación de failover básico con RabbitMQ
+- Uso eficiente de gRPC con Protocol Buffers para rendimiento
+
+---
+
+# 6. Referencias
+
+- Curso Fundamentos Básicos de Docker - Platzi
+- FastAPI & Swagger - Documentación oficial y asistencia ChatGPT
+- [gRPC Python Documentation](https://grpc.io/docs/languages/python/)
+- [RabbitMQ Documentation](https://www.rabbitmq.com/documentation.html)
+- "Middleware for Communications" - Qusay H. Mahmoud
+
+---
+
