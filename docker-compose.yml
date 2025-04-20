@@ -1,4 +1,3 @@
-# docker-compose.yml
 services:
   # --- BROKER RABBITMQ OFICIAL ---
   rabbitmq-broker:
@@ -22,9 +21,10 @@ services:
       - mul_service
       - div_service
     environment:
-      RABBIT_HOST: rabbitmq-broker
-      RABBIT_USER: admin
-      RABBIT_PASS: admin
+      - RABBIT_HOST=rabbitmq-broker
+      - RABBIT_USER=admin
+      - RABBIT_PASS=admin
+      - PYTHONUNBUFFERED=1
 
   # --- MICROSERVICIOS GRPC ---
   sum_service:
@@ -34,6 +34,8 @@ services:
       - "50051:50051"
     depends_on:
       - rabbitmq-broker
+    environment:
+      - PYTHONUNBUFFERED=1
 
   sub_service:
     build: ./sub_service
@@ -42,6 +44,8 @@ services:
       - "50052:50052"
     depends_on:
       - rabbitmq-broker
+    environment:
+      - PYTHONUNBUFFERED=1
 
   mul_service:
     build: ./mul_service
@@ -50,6 +54,8 @@ services:
       - "50053:50053"
     depends_on:
       - rabbitmq-broker
+    environment:
+      - PYTHONUNBUFFERED=1
 
   div_service:
     build: ./div_service
@@ -58,6 +64,8 @@ services:
       - "50054:50054"
     depends_on:
       - rabbitmq-broker
+    environment:
+      - PYTHONUNBUFFERED=1
 
   # --- GATEWAY FastAPI ---
   gateway:
@@ -71,6 +79,8 @@ services:
       - mul_service
       - div_service
       - rabbitmq-broker
+    environment:
+      - PYTHONUNBUFFERED=1
 
   # --- CLIENTE REST FastAPI ---
   client_rest:
@@ -80,3 +90,5 @@ services:
       - "9000:9000"
     depends_on:
       - gateway
+    environment:
+      - PYTHONUNBUFFERED=1
