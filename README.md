@@ -1,4 +1,4 @@
-# Proyecto: Calculadora Distribuida con gRPC, REST y RabbitMQ
+# Proyecto: Calculadora simple basada en microservicios
 
 ## Info de la materia
 
