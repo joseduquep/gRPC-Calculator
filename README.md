@@ -143,8 +143,7 @@ docker-compose up -d
 
 # 5. Credenciales de Acceso en AWS
 
-- jpzuluagap@eafit.edu.co
-- Aws1234*
+- Se adjuntaron al correo del profesor
 
 ![image](https://github.com/user-attachments/assets/cbb46cc0-528f-4f02-8a3a-16d00fc262f3)
 
