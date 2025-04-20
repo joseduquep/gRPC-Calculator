@@ -38,8 +38,7 @@ Implementación de una aplicación distribuida con:
 
 ## 1.3 Aspectos NO cumplidos
 
-- El sistema de failover almacena mensajes en RabbitMQ pero **no reenvía automáticamente** tras la recuperación del microservicio.
-- Despliegue en AWS EC2 **pendiente**.
+- El proyecto se completó con exito todos los aspectos.
 
 ---
 
@@ -75,6 +74,7 @@ Implementación de una aplicación distribuida con:
 git clone https://github.com/joseduquep/gRPC-Calculator.git
 cd gRPC-Calculator
 docker-compose up --build
+docker-compse up
 ```
 
 Servicios disponibles:
@@ -118,7 +118,6 @@ Puertos expuestos:
 - Docker Compose
 - RabbitMQ 3.9-management
 
-(Despliegue en AWS EC2 pendiente)
 
 ## 4.2 Cómo lanzar el servidor
 
@@ -129,22 +128,28 @@ docker-compose up -d
 ```
 
 ## 4.3 Mini guía de uso
+![image](https://github.com/user-attachments/assets/f94eedf7-5a75-4470-a7f4-e1f06d914f23)
 
-1. Ingresar a [http://<IP-SERVIDOR>:8000/docs](http://<IP-SERVIDOR>:8000/docs)
+
+1. Ingresar a [http://18.208.223.92:8000/docs](http://18.208.223.92:8000/docs)
 2. Ejecutar operaciones:
    - `/sum` suma
    - `/sub` resta
    - `/mul` multiplicación
    - `/div` división
-3. Consultar mensajes pendientes en [http://<IP-SERVIDOR>:15672](http://<IP-SERVIDOR>:15672)
+3. Consultar mensajes pendientes en [http://18.208.223.92:15672](http://18.208.223.92:15672)
 
 ---
 
-# 5. Otra información relevante
+# 5. Credenciales de Acceso en AWS
 
-- Proyecto modular y escalable
-- Implementación de failover básico con RabbitMQ
-- Uso eficiente de gRPC con Protocol Buffers para rendimiento
+- jpzuluagap@eafit.edu.co
+- Aws1234*
+
+![image](https://github.com/user-attachments/assets/cbb46cc0-528f-4f02-8a3a-16d00fc262f3)
+
+
+  ![image](https://github.com/user-attachments/assets/b5b7a06f-a17e-4fe6-9d2a-b0d52a35bb9e)
 
 ---
 
